@@ -40,39 +40,7 @@ function App() {
 	const [score, setScore] = useState(0);
 	const [currentNote, setCurrentNote] = useState({ f: 0, note: '' });
 
-	const handleKeyDown = useCallback(
-		({ keyCode }) => {
-			const pressedNote = KEY_AND_NOTES[keyCode];
-			if (!pressedNote) {
-				return;
-			}
-			if (pressedNote === currentNote.note) {
-				setScore(score + 1);
-				playNote();
-			}
-			setPressedNumber(pressedNumber + 1);
-		},
-		[currentNote.note, pressedNumber, score]
-	);
-
-	/* eslint-disable react-hooks/exhaustive-deps */
-	useEffect(() => {
-		let newNote = currentNote;
-		while (newNote.note === currentNote.note) {
-			newNote = getRandomNote();
-		}
-		setCurrentNote(newNote);
-	}, [pressedNumber]);
-	/* eslint-enable react-hooks/exhaustive-deps */
-
-	useEffect(() => {
-		document.addEventListener('keypress', handleKeyDown, false);
-		return () => {
-			document.removeEventListener('keypress', handleKeyDown);
-		};
-	}, [currentNote.note, pressedNumber, handleKeyDown]);
-
-	function playNote() {
+	const playNote = useCallback(() => {
 		// abcelem,
 		// tuneNumber,
 		// classes,
@@ -92,7 +60,39 @@ function App() {
 			0.00001,
 			context.currentTime + 2
 		);
-	}
+	}, [currentNote.f]);
+
+	const handleKeyDown = useCallback(
+		({ keyCode }) => {
+			const pressedNote = KEY_AND_NOTES[keyCode];
+			if (!pressedNote) {
+				return;
+			}
+			if (pressedNote === currentNote.note) {
+				setScore(score + 1);
+				playNote();
+			}
+			setPressedNumber(pressedNumber + 1);
+		},
+		[currentNote.note, pressedNumber, score, playNote]
+	);
+
+	/* eslint-disable react-hooks/exhaustive-deps */
+	useEffect(() => {
+		let newNote = currentNote;
+		while (newNote.note === currentNote.note) {
+			newNote = getRandomNote();
+		}
+		setCurrentNote(newNote);
+	}, [pressedNumber]);
+	/* eslint-enable react-hooks/exhaustive-deps */
+
+	useEffect(() => {
+		document.addEventListener('keypress', handleKeyDown, false);
+		return () => {
+			document.removeEventListener('keypress', handleKeyDown);
+		};
+	}, [currentNote.note, pressedNumber, handleKeyDown]);
 
 	if (!NOTES_SUBSET.length || currentNote.note === '') {
 		return <div>Loading...</div>;
