@@ -1,0 +1,37 @@
+.doremi {
+	width:70%;
+	margin: 0 auto;
+}
+
+.keycaps {
+	.keycap {
+		display: inline-block;
+		vertical-align: top;
+		zoom: 1;
+		position: relative;
+		z-index: 1;
+		margin: .5vmin;
+		padding-top: 2vmin;
+		padding-left: 3.5vmin;
+		background: #aaaaaa;
+		border: 1px solid rgba(0, 0, 0, .1);
+		text-align: left;
+		border-radius: 8px;
+		width: 70px;
+		height: 85px;
+	}
+
+	.keycap:before
+	{
+		content: '';
+		position: absolute;
+		top: 1vmin;
+		bottom: 2.5vmin;
+		right: 2vmin;
+		left: 2vmin;
+		z-index: -1;
+		background: #cccccc;
+		border: 1px solid rgba(255, 255, 255, .1);
+		border-radius: 8px;
+	}
+}
