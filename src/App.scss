@@ -39,4 +39,8 @@
 	.keycap:active:before {
 		background: rgba(255, 255, 255, .1);
 	}
+
+	.keycap:hover {
+		background: #BBB;
+	}
 }
