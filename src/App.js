@@ -1,7 +1,11 @@
 import './App.scss';
-import SheetMusic from './sheetmusic';
+import Staff from './staff';
 import notes from './notes';
 import { useCallback, useEffect, useState } from 'react';
+import Controls from './components/controls';
+import { Score } from './score';
+import Audio from './components/audio';
+import KeyListener from './components/key-listener';
 
 const KEY_AND_NOTES = {
 	99: 'C',
@@ -36,63 +40,45 @@ const getRandomNote = () => {
 };
 
 function App() {
-	const [pressedNumber, setPressedNumber] = useState(0);
 	const [score, setScore] = useState(0);
 	const [currentNote, setCurrentNote] = useState({ f: 0, note: '' });
+	const [playSound, setPlaySound] = useState(false);
+	const [refreshNote, setRefreshNote] = useState(true);
 
-	const playNote = useCallback(() => {
-		// abcelem,
-		// tuneNumber,
-		// classes,
-		// analysis,
-		// drag,
-		// mouseEvent
-		const context = new AudioContext();
-		const frequency = currentNote.f;
-		const oscillator = context.createOscillator();
-		const gain = context.createGain();
-		oscillator.type = 'sine';
-		oscillator.connect(gain);
-		oscillator.frequency.value = frequency;
-		gain.connect(context.destination);
-		oscillator.start(0);
-		gain.gain.exponentialRampToValueAtTime(
-			0.00001,
-			context.currentTime + 2
-		);
-	}, [currentNote.f]);
-
-	const handleKeyDown = useCallback(
-		({ keyCode }) => {
+	const processNote = useCallback(
+		(keyCode) => {
 			const pressedNote = KEY_AND_NOTES[keyCode];
 			if (!pressedNote) {
 				return;
 			}
+
 			if (pressedNote === currentNote.note) {
 				setScore(score + 1);
-				playNote();
+				setPlaySound(true);
 			}
-			setPressedNumber(pressedNumber + 1);
+			setRefreshNote(true);
 		},
-		[currentNote.note, pressedNumber, score, playNote]
+		[currentNote.note, score]
 	);
 
 	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
-		let newNote = currentNote;
-		while (newNote.note === currentNote.note) {
-			newNote = getRandomNote();
+		if (refreshNote) {
+			let newNote = currentNote;
+			while (newNote.note === currentNote.note) {
+				newNote = getRandomNote();
+			}
+			setRefreshNote(false);
+			setCurrentNote(newNote);
 		}
-		setCurrentNote(newNote);
-	}, [pressedNumber]);
+	}, [refreshNote]);
 	/* eslint-enable react-hooks/exhaustive-deps */
 
 	useEffect(() => {
-		document.addEventListener('keypress', handleKeyDown, false);
-		return () => {
-			document.removeEventListener('keypress', handleKeyDown);
-		};
-	}, [currentNote.note, pressedNumber, handleKeyDown]);
+		if (playSound) {
+			setPlaySound(false);
+		}
+	}, [playSound]);
 
 	if (!NOTES_SUBSET.length || currentNote.note === '') {
 		return <div>Loading...</div>;
@@ -100,18 +86,14 @@ function App() {
 
 	return (
 		<div className="doremi">
-			<p>Score: {score}</p>
-			<SheetMusic abcNotation={currentNote.note} onClick={playNote} />
-			<div className="keycaps">
-				<p>Use the following keys to guess the notes in the staff:</p>
-				<div className="keycap">C</div>
-				<div className="keycap">D</div>
-				<div className="keycap">E</div>
-				<div className="keycap">F</div>
-				<div className="keycap">G</div>
-				<div className="keycap">A</div>
-				<div className="keycap">B</div>
-			</div>
+			<KeyListener onKeyDown={processNote} />
+			<Audio play={playSound} frequency={currentNote.f} />
+			<Score score={score} />
+			<Staff
+				abcNotation={currentNote.note}
+				onClick={() => setPlaySound(true)}
+			/>
+			<Controls onClickControl={processNote} />
 		</div>
 	);
 }

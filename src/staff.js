@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import abcjs from 'abcjs';
 
-const SheetMusic = ({ abcNotation, onClick }) => {
+const Staff = ({ abcNotation, onClick }) => {
 	useEffect(() => {
 		var visualOptions = {
 			clickListener: onClick,
@@ -19,4 +19,4 @@ const SheetMusic = ({ abcNotation, onClick }) => {
 	);
 };
 
-export default SheetMusic;
+export default Staff;

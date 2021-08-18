@@ -19,6 +19,7 @@
 		border-radius: 8px;
 		width: 70px;
 		height: 85px;
+		cursor: pointer;
 	}
 
 	.keycap:before
@@ -33,5 +34,9 @@
 		background: #cccccc;
 		border: 1px solid rgba(255, 255, 255, .1);
 		border-radius: 8px;
+	}
+
+	.keycap:active:before {
+		background: rgba(255, 255, 255, .1);
 	}
 }
