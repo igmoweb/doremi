@@ -1,58 +1,37 @@
 import './App.scss';
-import Staff from './staff';
-import notes from './notes';
+import Staff from './components/staff';
 import { useCallback, useEffect, useState } from 'react';
 import Controls from './components/controls';
-import { Score } from './score';
+import Score from './components/score';
 import Audio from './components/audio';
-import KeyListener from './components/key-listener';
-
-const KEY_AND_NOTES = {
-	99: 'C',
-	67: 'C',
-	100: 'D',
-	68: 'D',
-	101: 'E',
-	69: 'E',
-	102: 'F',
-	70: 'F',
-	103: 'G',
-	71: 'G',
-	97: 'A',
-	98: 'B',
-	65: 'A',
-	66: 'B',
-};
-
-const NOTES_SUBSET = Object.entries(notes)
-	.filter(([noteKey]) => {
-		const hasSharp = noteKey.indexOf('#') > -1;
-		const hasFlat = noteKey.indexOf('b') > -1;
-		const octave = noteKey[noteKey.length - 1];
-		return octave < 5 && octave > 3 && !hasSharp && !hasFlat;
-	})
-	.map(([_, note]) => {
-		return note;
-	});
-
-const getRandomNote = () => {
-	return NOTES_SUBSET[Math.floor(Math.random() * NOTES_SUBSET.length)];
-};
+import keyNotesMap from './utils/key-notes-map';
+import useNotes from './hooks/use-notes';
+import defaultSettings from './utils/default-settings';
+import normalizeNote from './utils/normalize-note';
+import Settings from './components/settings';
 
 function App() {
 	const [score, setScore] = useState(0);
 	const [currentNote, setCurrentNote] = useState({ f: 0, note: '' });
 	const [playSound, setPlaySound] = useState(false);
 	const [refreshNote, setRefreshNote] = useState(true);
+	const [settings, setSettings] = useState(defaultSettings);
+
+	const notesSubSet = useNotes(settings);
+
+	const getRandomNote = useCallback(() => {
+		return notesSubSet[Math.floor(Math.random() * notesSubSet.length)];
+	}, [notesSubSet]);
 
 	const processNote = useCallback(
 		(keyCode) => {
-			const pressedNote = KEY_AND_NOTES[keyCode];
+			const pressedNote = keyNotesMap[keyCode];
 			if (!pressedNote) {
 				return;
 			}
 
-			if (pressedNote === currentNote.note) {
+			const normalizedCurrentNote = normalizeNote(currentNote.note);
+			if (pressedNote === normalizedCurrentNote) {
 				setScore(score + 1);
 				setPlaySound(true);
 			}
@@ -63,7 +42,7 @@ function App() {
 
 	/* eslint-disable react-hooks/exhaustive-deps */
 	useEffect(() => {
-		if (refreshNote) {
+		if (refreshNote && notesSubSet.length > 0) {
 			let newNote = currentNote;
 			while (newNote.note === currentNote.note) {
 				newNote = getRandomNote();
@@ -71,7 +50,7 @@ function App() {
 			setRefreshNote(false);
 			setCurrentNote(newNote);
 		}
-	}, [refreshNote]);
+	}, [refreshNote, notesSubSet]);
 	/* eslint-enable react-hooks/exhaustive-deps */
 
 	useEffect(() => {
@@ -80,20 +59,31 @@ function App() {
 		}
 	}, [playSound]);
 
-	if (!NOTES_SUBSET.length || currentNote.note === '') {
+	if (!notesSubSet.length || currentNote.note === '') {
 		return <div>Loading...</div>;
 	}
 
 	return (
 		<div className="doremi">
-			<KeyListener onKeyDown={processNote} />
 			<Audio play={playSound} frequency={currentNote.f} />
 			<Score score={score} />
-			<Staff
-				abcNotation={currentNote.note}
-				onClick={() => setPlaySound(true)}
+			<div className="row">
+				<Staff
+					abcNotation={currentNote.note}
+					onClick={() => setPlaySound(true)}
+				/>
+			</div>
+			<Controls onPressNote={processNote} />
+			<Settings
+				settings={settings}
+				onChangeSetting={(setting, value) => {
+					setSettings({
+						...settings,
+						[setting]: value,
+					});
+					setRefreshNote(true);
+				}}
 			/>
-			<Controls onClickControl={processNote} />
 		</div>
 	);
 }

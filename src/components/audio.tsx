@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const Audio = ({ play, frequency }) => {
+const Audio = ({ play, frequency }: { play: boolean; frequency: number }) => {
 	useEffect(() => {
 		if (play) {
 			const audioContext = new AudioContext();

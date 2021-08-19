@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-const KeyListener = ({ onKeyDown }) => {
+const KeyListener = ({ onKeyDown }: { onKeyDown: Function }) => {
 	const [pressedCounter, setPressedCounter] = useState(0);
 	const [lastPressedKey, setLastPressedKey] = useState(false);
 
@@ -13,7 +13,7 @@ const KeyListener = ({ onKeyDown }) => {
 	);
 
 	useEffect(() => {
-		if (lastPressedKey !== false) {
+		if (lastPressedKey) {
 			onKeyDown(lastPressedKey);
 			setLastPressedKey(false);
 		}
