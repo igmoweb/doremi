@@ -5,13 +5,19 @@ import abcjs from 'abcjs';
 
 const Staff = ({
 	abcNotation,
+	clef,
 	onClick,
 }: {
 	abcNotation: string;
+	clef: 'treble' | 'bass';
 	onClick: Function;
 }) => {
 	useEffect(() => {
-		abcjs.renderAbc('staff', abcNotation, {
+		const notation = `
+K:clef=${clef}
+${abcNotation}
+		`;
+		abcjs.renderAbc('staff', notation, {
 			clickListener: onClick,
 			add_classes: true,
 			scale: 3,

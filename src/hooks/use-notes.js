@@ -20,9 +20,13 @@ const useNotes = (options = {}) => {
 					const difficulty =
 						args.difficulty || defaultSettings.difficulty;
 
+					const clef = args.clef || defaultSettings.clef;
+
 					// @ts-ignore
 					const difficultyOctaves =
-						difficultiesOctavesMap[difficulty];
+						difficultiesOctavesMap[clef][difficulty];
+
+					console.log(difficultyOctaves);
 
 					if (
 						difficultyOctaves.indexOf(parseInt(noteOctave, 10)) < 0
@@ -38,7 +42,7 @@ const useNotes = (options = {}) => {
 				.map(([_, note]) => {
 					return note;
 				}),
-		[args.withFlats, args.withSharps, args.difficulty]
+		[args.withFlats, args.withSharps, args.difficulty, args.clef]
 	);
 };
 

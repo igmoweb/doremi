@@ -48,3 +48,46 @@
 .staff-wrap {
 	//min-height: 340px;
 }
+
+.row {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+@keyframes fadeOut {
+	0% {
+		opacity:1;
+	}
+	100% {
+		opacity:0;
+	}
+}
+
+.notice {
+	animation: fadeOut ease .5s;
+	position: relative;
+	left: -30rem;
+}
+
+.score {
+	margin-top: 1rem;
+	display: flex;
+	font-size: 1.2rem;
+	div {
+		text-align: center;
+		padding: 0.7rem 1.2rem;
+		border: 1px solid gray;
+	}
+}
+
+.settings {
+	font-size: 1.1rem;
+	div {
+		margin-bottom: 0.8rem;
+		display: flex;
+		label {
+			width: 100px;
+		}
+	}
+}

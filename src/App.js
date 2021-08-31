@@ -9,13 +9,17 @@ import useNotes from './hooks/use-notes';
 import defaultSettings from './utils/default-settings';
 import normalizeNote from './utils/normalize-note';
 import Settings from './components/settings';
+import Notice from './components/notice';
+import Icon from './components/icon';
 
 function App() {
-	const [score, setScore] = useState(0);
+	const [hits, setHits] = useState(0);
+	const [missed, setMissed] = useState(0);
 	const [currentNote, setCurrentNote] = useState({ f: 0, note: '' });
 	const [playSound, setPlaySound] = useState(false);
 	const [refreshNote, setRefreshNote] = useState(true);
 	const [settings, setSettings] = useState(defaultSettings);
+	const [notice, setNotice] = useState(null);
 
 	const notesSubSet = useNotes(settings);
 
@@ -32,12 +36,16 @@ function App() {
 
 			const normalizedCurrentNote = normalizeNote(currentNote.note);
 			if (pressedNote === normalizedCurrentNote) {
-				setScore(score + 1);
+				setHits(hits + 1);
 				setPlaySound(true);
+				setNotice(true);
+			} else {
+				setNotice(false);
+				setMissed(missed + 1);
 			}
 			setRefreshNote(true);
 		},
-		[currentNote.note, score]
+		[currentNote.note, hits, setMissed, missed]
 	);
 
 	/* eslint-disable react-hooks/exhaustive-deps */
@@ -66,12 +74,18 @@ function App() {
 	return (
 		<div className="doremi">
 			<Audio play={playSound} frequency={currentNote.f} />
-			<Score score={score} />
+			<Score hits={hits} missed={missed} />
 			<div className="row">
 				<Staff
 					abcNotation={currentNote.note}
+					clef={settings.clef}
 					onClick={() => setPlaySound(true)}
 				/>
+				{notice !== null && (
+					<Notice onDismiss={() => setNotice(null)}>
+						<Icon icon={notice ? 'yes' : 'no'} />
+					</Notice>
+				)}
 			</div>
 			<Controls onPressNote={processNote} />
 			<Settings

@@ -2,6 +2,7 @@ import difficultiesOctavesMap from '../utils/difficulties-octaves-map';
 
 type SettingsType = {
 	difficulty: 'easy' | 'medium' | 'hard';
+	clef: 'treble' | 'bass';
 };
 
 const Settings = ({
@@ -23,7 +24,7 @@ const Settings = ({
 					}
 					value={settings.difficulty}
 				>
-					{Object.keys(difficultiesOctavesMap).map(
+					{Object.keys(difficultiesOctavesMap[settings.clef]).map(
 						(difficulty: string) => {
 							return (
 								<option value={difficulty} key={difficulty}>
@@ -33,6 +34,24 @@ const Settings = ({
 							);
 						}
 					)}
+				</select>
+			</div>
+			<div>
+				<label htmlFor="clef">Clef</label>
+				<select
+					id="clef"
+					onChange={({ target }) =>
+						onChangeSetting('clef', target.value)
+					}
+					value={settings.clef}
+				>
+					{Object.keys(difficultiesOctavesMap).map((clef: string) => {
+						return (
+							<option value={clef} key={clef}>
+								{clef.charAt(0).toUpperCase() + clef.slice(1)}
+							</option>
+						);
+					})}
 				</select>
 			</div>
 		</form>
