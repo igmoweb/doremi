@@ -1,4 +1,6 @@
-const defaultSettings = {
+import { SettingsType } from '../types';
+
+const defaultSettings: SettingsType = {
 	withSharps: false,
 	withFlats: false,
 	difficulty: 'easy',

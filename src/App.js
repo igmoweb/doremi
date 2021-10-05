@@ -1,16 +1,20 @@
 import './App.scss';
 import Staff from './components/staff';
-import { useCallback, useEffect, useState } from 'react';
-import Controls from './components/controls';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Score from './components/score';
 import Audio from './components/audio';
 import keyNotesMap from './utils/key-notes-map';
 import useNotes from './hooks/use-notes';
 import defaultSettings from './utils/default-settings';
 import normalizeNote from './utils/normalize-note';
-import Settings from './components/settings';
 import Notice from './components/notice';
 import Icon from './components/icon';
+import SidebarMenu from './components/sidebar-menu';
+import ButtonIcon from './components/button-icon';
+import KeyListener from './components/key-listener';
+import { AppContext, useStore } from './store/context';
+import { toggleMenu } from './store/actions';
+import Controls from './components/controls';
 
 function App() {
 	const [hits, setHits] = useState(0);
@@ -20,6 +24,9 @@ function App() {
 	const [refreshNote, setRefreshNote] = useState(true);
 	const [settings, setSettings] = useState(defaultSettings);
 	const [notice, setNotice] = useState(null);
+
+	const [state, dispatch] = useStore();
+	const { isMenuOpened } = state;
 
 	const notesSubSet = useNotes(settings);
 
@@ -72,33 +79,52 @@ function App() {
 	}
 
 	return (
-		<div className="doremi">
-			<Audio play={playSound} frequency={currentNote.f} />
-			<Score hits={hits} missed={missed} />
-			<div className="row">
-				<Staff
-					abcNotation={currentNote.note}
-					clef={settings.clef}
-					onClick={() => setPlaySound(true)}
+		<>
+			<KeyListener onKeyDown={processNote} />
+			{isMenuOpened && <div id="sidebar-overlay" />}
+			<div className="doremi" id="doremi">
+				<SidebarMenu
+					open={isMenuOpened}
+					onClose={() => {
+						dispatch(toggleMenu());
+					}}
+					settings={settings}
+					onChangeSetting={(setting, value) => {
+						setSettings({
+							...settings,
+							[setting]: value,
+						});
+						setRefreshNote(true);
+					}}
 				/>
-				{notice !== null && (
-					<Notice onDismiss={() => setNotice(null)}>
-						<Icon icon={notice ? 'yes' : 'no'} />
-					</Notice>
-				)}
+				<div id="header">
+					<ButtonIcon
+						icon="menu"
+						onClick={() => {
+							dispatch(toggleMenu());
+						}}
+					/>
+					<h1>Learn to read music notes</h1>
+				</div>
+				<div id="content">
+					<Audio play={playSound} frequency={currentNote.f} />
+					<Score hits={hits} missed={missed} />
+					<div className="row">
+						<Staff
+							abcNotation={currentNote.note}
+							clef={settings.clef}
+							onClick={() => setPlaySound(true)}
+						/>
+						{notice !== null && (
+							<Notice onDismiss={() => setNotice(null)}>
+								<Icon icon={notice ? 'yes' : 'no'} />
+							</Notice>
+						)}
+					</div>
+					<Controls />
+				</div>
 			</div>
-			<Controls onPressNote={processNote} />
-			<Settings
-				settings={settings}
-				onChangeSetting={(setting, value) => {
-					setSettings({
-						...settings,
-						[setting]: value,
-					});
-					setRefreshNote(true);
-				}}
-			/>
-		</div>
+		</>
 	);
 }
 

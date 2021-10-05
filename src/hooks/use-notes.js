@@ -26,8 +26,6 @@ const useNotes = (options = {}) => {
 					const difficultyOctaves =
 						difficultiesOctavesMap[clef][difficulty];
 
-					console.log(difficultyOctaves);
-
 					if (
 						difficultyOctaves.indexOf(parseInt(noteOctave, 10)) < 0
 					) {
