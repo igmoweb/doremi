@@ -1,6 +1,6 @@
 import './App.scss';
 import Staff from './components/staff';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Score from './components/score';
 import Audio from './components/audio';
 import keyNotesMap from './utils/key-notes-map';
@@ -12,7 +12,7 @@ import Icon from './components/icon';
 import SidebarMenu from './components/sidebar-menu';
 import ButtonIcon from './components/button-icon';
 import KeyListener from './components/key-listener';
-import { AppContext, useStore } from './store/context';
+import { useStore } from './store/context';
 import { toggleMenu } from './store/actions';
 import Controls from './components/controls';
 

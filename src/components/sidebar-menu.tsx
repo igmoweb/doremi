@@ -1,6 +1,5 @@
 import ButtonIcon from './button-icon';
 import React from 'react';
-import Controls from './controls';
 import Settings from './settings';
 
 const SidebarMenu = ({
